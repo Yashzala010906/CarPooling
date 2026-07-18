@@ -49,6 +49,26 @@
   }
 }
 
+.ride-screen {
+  --background: 220 50% 98%;
+  --foreground: 210 32% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 32% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 32% 11%;
+  --primary: 199 69% 32%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 205 38% 88%;
+  --secondary-foreground: 210 19% 24%;
+  --muted: 212 52% 96%;
+  --muted-foreground: 207 10% 31%;
+  --accent: 205 38% 92%;
+  --accent-foreground: 210 32% 11%;
+  --border: 210 18% 78%;
+  --input: 210 18% 78%;
+  --ring: 199 69% 32%;
+}
+
 @layer base {
   * {
     @apply border-border;

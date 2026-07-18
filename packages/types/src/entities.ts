@@ -78,6 +78,12 @@ export interface Ride {
   isRecurring: boolean;
   /** Encoded polyline from the maps provider, for route preview. */
   routePolyline?: string | null;
+  /** Driver notes shown to passengers (drop-off specifics, preferences). */
+  notes?: string | null;
+  /** Route distance in km from the maps provider, when available. */
+  routeDistanceKm?: number | null;
+  /** Estimated travel time in minutes from the maps provider, when available. */
+  estimatedDurationMins?: number | null;
   status: RideStatus;
   createdAt: string;
   updatedAt: string;

@@ -9,6 +9,7 @@ export enum UserRole {
 }
 
 export enum RideStatus {
+  DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
   FULL = 'FULL',
   IN_PROGRESS = 'IN_PROGRESS',

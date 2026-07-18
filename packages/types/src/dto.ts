@@ -37,7 +37,16 @@ export interface PublishRideRequest {
   seatsTotal: number;
   farePerSeat: number;
   isRecurring?: boolean;
+  /** Driver notes shown to passengers (drop-off specifics, preferences). */
+  notes?: string;
+  /** Route distance in km from the maps provider, when available. */
+  routeDistanceKm?: number;
+  /** Estimated travel time in minutes from the maps provider, when available. */
+  estimatedDurationMins?: number;
 }
+
+/** Partial update of a published ride; same rules re-validated server-side. */
+export type UpdateRideRequest = Partial<PublishRideRequest>;
 
 export interface CreateBookingRequest {
   rideId: string;

@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { useAuthStore } from '@/stores/auth.store';
+
 /**
  * Shared Axios instance for the NestJS API.
  * All services in lib/api/services use this client.
@@ -12,9 +14,8 @@ export const apiClient = axios.create({
 
 // Attach the access token to every request.
 apiClient.interceptors.request.use((config) => {
-  // TODO: read token from the auth store / cookie
-  // const token = useAuthStore.getState().accessToken;
-  // if (token) config.headers.Authorization = `Bearer ${token}`;
+  const token = useAuthStore.getState().accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

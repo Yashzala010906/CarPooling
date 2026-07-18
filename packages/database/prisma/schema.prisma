@@ -18,6 +18,7 @@ enum UserRole {
 }
 
 enum RideStatus {
+  DRAFT
   PUBLISHED
   FULL
   IN_PROGRESS
@@ -173,6 +174,9 @@ model Ride {
   isRecurring    Boolean    @default(false)
   recurrence     Json? // days-of-week pattern for recurring rides
   routePolyline  String? // encoded polyline from maps provider
+  notes          String? // driver notes shown to passengers (drop-off specifics, preferences)
+  routeDistanceKm       Float? // route distance from maps provider, when available
+  estimatedDurationMins Int? // estimated travel time from maps provider, when available
   status         RideStatus @default(PUBLISHED)
 
   bookings Booking[]

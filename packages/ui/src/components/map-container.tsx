@@ -17,6 +17,7 @@ export interface MapContainerProps extends React.HTMLAttributes<HTMLDivElement> 
   markers?: MapMarker[];
   /** Encoded polyline for the route preview. */
   polyline?: string;
+  backgroundImageUrl?: string;
 }
 
 /**
@@ -32,6 +33,7 @@ export function MapContainer({
   zoom = 13,
   markers = [],
   polyline,
+  backgroundImageUrl,
   className,
   ...props
 }: MapContainerProps) {
@@ -43,14 +45,24 @@ export function MapContainer({
       )}
       {...props}
     >
-      <div className="flex flex-col items-center gap-2 text-muted-foreground">
-        <MapPin className="h-8 w-8" />
-        <p className="text-sm font-medium">Map placeholder</p>
-        <p className="text-xs">
-          center: {center ? `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}` : 'unset'} · zoom:{' '}
-          {zoom} · {markers.length} marker(s){polyline ? ' · route set' : ''}
-        </p>
-      </div>
+      {backgroundImageUrl ? (
+        <div
+          aria-label="Static route map preview"
+          className="absolute inset-0 bg-cover bg-center"
+          role="img"
+          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+        />
+      ) : null}
+      {!backgroundImageUrl ? (
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+          <MapPin className="h-8 w-8" />
+          <p className="text-sm font-medium">Map placeholder</p>
+          <p className="text-xs">
+            center: {center ? `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}` : 'unset'} ·
+            zoom: {zoom} · {markers.length} marker(s){polyline ? ' · route set' : ''}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
