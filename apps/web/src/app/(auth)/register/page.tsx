@@ -1,18 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@carpool/ui';
+import { AuthCard } from '@/components/auth/auth-card';
+import { RegisterForm } from '@/components/auth/register-form';
 
 export const metadata = { title: 'Sign Up' };
 
 export default function RegisterPage() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>Register with your company code and profile details.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {/* TODO: RegisterForm → authService.register */}
-        <p className="text-sm text-muted-foreground">Registration form placeholder.</p>
-      </CardContent>
-    </Card>
+    <AuthCard sideLabel="Sign Up" maxWidth="max-w-3xl">
+      <RegisterForm />
+    </AuthCard>
   );
 }
