@@ -1,0 +1,11 @@
+{
+  "extends": "@carpool/typescript-config/base.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src", "prisma/seed.ts"]
+}

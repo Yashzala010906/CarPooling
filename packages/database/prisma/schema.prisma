@@ -1,0 +1,321 @@
+// Carpooling Platform — shared data model
+// Owned jointly by the team: schema changes require review from all three devs.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Enums ───────────────────────────
+
+enum UserRole {
+  COMPANY_ADMIN
+  EMPLOYEE
+}
+
+enum RideStatus {
+  PUBLISHED
+  FULL
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Trip lifecycle per problem statement §5.4
+enum TripStatus {
+  BOOKED
+  STARTED
+  IN_PROGRESS
+  COMPLETED
+  PAYMENT_PENDING
+  PAYMENT_COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  UPI
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum WalletTransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum NotificationType {
+  RIDE
+  BOOKING
+  TRIP
+  PAYMENT
+  SYSTEM
+}
+
+// ─────────────────────── Identity & Org ──────────────────────
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique // employees register with this code
+  settings  Json?    // fuel cost, cost/km, operational config (§3 admin)
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id])
+  role         UserRole @default(EMPLOYEE)
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  firstName    String
+  lastName     String
+  avatarUrl    String?
+  isActive     Boolean  @default(true)
+
+  vehicles      Vehicle[]
+  savedPlaces   SavedPlace[]
+  ridesOffered  Ride[]              @relation("DriverRides")
+  bookings      Booking[]
+  wallet        Wallet?
+  payments      Payment[]
+  chatMessages  ChatMessage[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@map("users")
+}
+
+// ─────────────────────────── Vehicles ────────────────────────
+
+model Vehicle {
+  id                 String  @id @default(cuid())
+  ownerId            String
+  owner              User    @relation(fields: [ownerId], references: [id])
+  model              String
+  registrationNumber String  @unique
+  seatingCapacity    Int
+  fuelType           String?
+  mileageKmPerLitre  Float? // used by fuel-efficiency reports (§5.9)
+  isActive           Boolean @default(true)
+
+  rides Ride[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@map("vehicles")
+}
+
+model SavedPlace {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  label   String // Home, Office, ...
+  address String
+  lat     Float
+  lng     Float
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("saved_places")
+}
+
+// ──────────────────────── Ride lifecycle ─────────────────────
+
+model Ride {
+  id        String  @id @default(cuid())
+  driverId  String
+  driver    User    @relation("DriverRides", fields: [driverId], references: [id])
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  originAddress      String
+  originLat          Float
+  originLng          Float
+  destinationAddress String
+  destinationLat     Float
+  destinationLng     Float
+
+  departureAt    DateTime
+  seatsTotal     Int
+  seatsAvailable Int
+  farePerSeat    Decimal    @db.Decimal(10, 2)
+  isRecurring    Boolean    @default(false)
+  recurrence     Json? // days-of-week pattern for recurring rides
+  routePolyline  String? // encoded polyline from maps provider
+  status         RideStatus @default(PUBLISHED)
+
+  bookings Booking[]
+  trip     Trip?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([status, departureAt])
+  @@map("rides")
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  rideId      String
+  ride        Ride          @relation(fields: [rideId], references: [id])
+  passengerId String
+  passenger   User          @relation(fields: [passengerId], references: [id])
+  seats       Int           @default(1)
+  fareTotal   Decimal       @db.Decimal(10, 2)
+  status      BookingStatus @default(PENDING)
+
+  payment Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rideId])
+  @@index([passengerId])
+  @@map("bookings")
+}
+
+model Trip {
+  id          String     @id @default(cuid())
+  rideId      String     @unique
+  ride        Ride       @relation(fields: [rideId], references: [id])
+  status      TripStatus @default(BOOKED)
+  startedAt   DateTime?
+  completedAt DateTime?
+  distanceKm  Float?
+
+  locations    TripLocation[]
+  chatMessages ChatMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("trips")
+}
+
+// Live-tracking pings, written only while a trip is active (§7)
+model TripLocation {
+  id         String   @id @default(cuid())
+  tripId     String
+  trip       Trip     @relation(fields: [tripId], references: [id])
+  lat        Float
+  lng        Float
+  recordedAt DateTime @default(now())
+
+  @@index([tripId, recordedAt])
+  @@map("trip_locations")
+}
+
+// ─────────────────────── Wallet & Payments ───────────────────
+
+model Wallet {
+  id      String  @id @default(cuid())
+  userId  String  @unique
+  user    User    @relation(fields: [userId], references: [id])
+  balance Decimal @default(0) @db.Decimal(10, 2)
+
+  transactions WalletTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id          String                @id @default(cuid())
+  walletId    String
+  wallet      Wallet                @relation(fields: [walletId], references: [id])
+  type        WalletTransactionType
+  amount      Decimal               @db.Decimal(10, 2)
+  description String?
+  referenceId String? // payment id / razorpay order id
+
+  createdAt DateTime @default(now())
+
+  @@index([walletId])
+  @@map("wallet_transactions")
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  bookingId String        @unique
+  booking   Booking       @relation(fields: [bookingId], references: [id])
+  payerId   String
+  payer     User          @relation(fields: [payerId], references: [id])
+  amount    Decimal       @db.Decimal(10, 2)
+  method    PaymentMethod
+  status    PaymentStatus @default(PENDING)
+
+  // Razorpay test-mode references
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([payerId])
+  @@map("payments")
+}
+
+// ─────────────────── Chat & Notifications ────────────────────
+
+model ChatMessage {
+  id       String   @id @default(cuid())
+  tripId   String
+  trip     Trip     @relation(fields: [tripId], references: [id])
+  senderId String
+  sender   User     @relation(fields: [senderId], references: [id])
+  content  String
+  sentAt   DateTime @default(now())
+
+  @@index([tripId, sentAt])
+  @@map("chat_messages")
+}
+
+model Notification {
+  id     String           @id @default(cuid())
+  userId String
+  user   User             @relation(fields: [userId], references: [id])
+  type   NotificationType
+  title  String
+  body   String
+  isRead Boolean          @default(false)
+  data   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}

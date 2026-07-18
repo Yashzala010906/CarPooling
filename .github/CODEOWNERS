@@ -1,0 +1,21 @@
+# Adjust GitHub usernames once the team is set.
+# Dev A - Identity & Organization
+/apps/api/src/modules/auth/          @dev-a
+/apps/api/src/modules/users/         @dev-a
+/apps/api/src/modules/company/       @dev-a
+
+# Dev B - Ride Lifecycle & Realtime
+/apps/api/src/modules/ride/          @dev-b
+/apps/api/src/modules/booking/       @dev-b
+/apps/api/src/modules/trip/          @dev-b
+/apps/api/src/modules/chat/          @dev-b
+
+# Dev C - Money & Insights
+/apps/api/src/modules/wallet/        @dev-c
+/apps/api/src/modules/payment/       @dev-c
+/apps/api/src/modules/reports/       @dev-c
+/apps/api/src/modules/notification/  @dev-c
+
+# Shared surfaces require joint review
+/packages/                           @dev-a @dev-b @dev-c
+/packages/database/prisma/           @dev-a @dev-b @dev-c
