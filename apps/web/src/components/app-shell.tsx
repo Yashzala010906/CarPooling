@@ -121,7 +121,9 @@ export function AppShell({ user, children }: { user: MenuUser; children: React.R
         }
       >
         {isImmersiveRideScreen ? (
-          <span className="text-sm text-muted-foreground">Route Information</span>
+          <span className="text-sm text-muted-foreground">
+            {pathname === '/rides/confirm' ? 'Route Confirmation' : 'Route Information'}
+          </span>
         ) : (
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-primary">
             <Car className="h-5 w-5 fill-primary" />
