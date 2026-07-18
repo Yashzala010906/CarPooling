@@ -1,12 +1,25 @@
-export const metadata = { title: 'Ride History' };
+import { getRideHistory } from '@/lib/member3/queries';
+import { getAuthState } from '@/lib/member3/session';
+import { PageHeading } from '@/components/member3/page-heading';
+import { RideHistoryTable } from '@/components/member3/ride-history-table';
+import { NotConfiguredNotice, SignInPrompt } from '@/components/member3/states';
 
-export default function RideHistoryPage() {
+export const metadata = { title: 'Ride History' };
+export const dynamic = 'force-dynamic';
+
+export default async function RideHistoryPage() {
+  const auth = await getAuthState();
+
   return (
-    <section className="space-y-2">
-      <h1 className="text-2xl font-semibold tracking-tight">Ride History</h1>
-      <p className="text-sm text-muted-foreground">
-        All completed trips: participants, route, vehicle, date, and status. (spec 5.7)
-      </p>
+    <section className="space-y-6">
+      <PageHeading title="Ride History" description="Your completed and cancelled trips." />
+      {!auth.configured ? (
+        <NotConfiguredNotice />
+      ) : !auth.userId ? (
+        <SignInPrompt />
+      ) : (
+        <RideHistoryTable items={await getRideHistory()} />
+      )}
     </section>
   );
 }

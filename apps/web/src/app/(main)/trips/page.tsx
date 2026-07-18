@@ -1,12 +1,28 @@
-export const metadata = { title: 'My Trips' };
+import { getMyTrips } from '@/lib/member3/queries';
+import { getAuthState } from '@/lib/member3/session';
+import { PageHeading } from '@/components/member3/page-heading';
+import { TripsBoard } from '@/components/member3/trips-board';
+import { NotConfiguredNotice, SignInPrompt } from '@/components/member3/states';
 
-export default function MyTripsPage() {
+export const metadata = { title: 'My Trips' };
+export const dynamic = 'force-dynamic';
+
+export default async function MyTripsPage() {
+  const auth = await getAuthState();
+
   return (
-    <section className="space-y-2">
-      <h1 className="text-2xl font-semibold tracking-tight">My Trips</h1>
-      <p className="text-sm text-muted-foreground">
-        Booked and offered trips with their current lifecycle status. (spec 5.4)
-      </p>
+    <section className="space-y-6">
+      <PageHeading
+        title="My Trips"
+        description="Trips you drive or have booked, with their live lifecycle status."
+      />
+      {!auth.configured ? (
+        <NotConfiguredNotice />
+      ) : !auth.userId ? (
+        <SignInPrompt />
+      ) : (
+        <TripsBoard items={await getMyTrips()} />
+      )}
     </section>
   );
 }
