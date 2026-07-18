@@ -1,25 +1,22 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/', '/login', '/register'];
+import { updateSession } from '@/lib/supabase/middleware';
 
 /**
- * Auth guard placeholder.
- * TODO: read the access token cookie, verify/refresh it, and redirect
- * unauthenticated users to /login for protected routes.
+ * Root middleware — refreshes the Supabase auth session on every request and
+ * redirects unauthenticated users away from protected routes. See
+ * `@/lib/supabase/middleware` for the guard logic.
  */
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  if (PUBLIC_PATHS.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // const token = request.cookies.get('access_token')?.value;
-  // if (!token) return NextResponse.redirect(new URL('/login', request.url));
-
-  return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  return updateSession(request);
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|ico)$).*)'],
+  matcher: [
+    /*
+     * Match all request paths except static assets and image files so the
+     * session cookie is refreshed on every real navigation.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+  ],
 };
