@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Carpooling Platform - UI/UX Prototype</title>
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- React & Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-display: 'Outfit', var(--font-sans);
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --surface-hover: #f1f5f9;
+      --primary: hsl(262, 52%, 47%);
+      --primary-hover: hsl(262, 52%, 40%);
+      --primary-light: hsl(262, 100%, 97%);
+      --primary-border: hsl(262, 40%, 90%);
+      --secondary: #0f172a;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border: #e2e8f0;
+      --border-focus: hsl(262, 52%, 75%);
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --success-border: #a7f3d0;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --warning-border: #fde68a;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --danger-border: #fca5a5;
+      --info: #3b82f6;
+      --info-light: #eff6ff;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+      --shadow-primary: 0 10px 15px -3px rgba(113, 75, 103, 0.15);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--background);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseSoft {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.95; }
+    }
+
+    @keyframes mapPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 0.2; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
+    .animate-fade {
+      animation: fadeIn var(--transition-normal) forwards;
+    }
+
+    .pulse-soft {
+      animation: pulseSoft 2s infinite ease-in-out;
+    }
+
+    .map-pulse {
+      animation: mapPulse 1.8s infinite ease-in-out;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 0.875rem;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(113, 75, 103, 0.25);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--text-light);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover {
+      background-color: var(--surface-hover);
+      color: var(--text-main);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #ffffff;
+    }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    .card {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-interactive {
+      cursor: pointer;
+    }
+    .card-interactive:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .input-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      color: var(--text-main);
+      transition: all var(--transition-fast);
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .badge-success {
+      background-color: var(--success-light);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .badge-warning {
+      background-color: var(--warning-light);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .badge-danger {
+      background-color: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .badge-info {
+      background-color: var(--info-light);
+      color: var(--info);
+      border: 1px solid #bfdbfe;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .top-bar {
+      height: 70px;
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .view-container {
+      padding: 32px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      animation: fadeIn var(--transition-normal) forwards;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .app-container {
+        flex-direction: column;
+      }
+      .main-content {
+        height: calc(100vh - 60px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- UMD React Component Definitions -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef, createContext, useContext } = React;
+
+    // --- MOCK DATABASE ---
+    const initialEmployees = [
+      { id: "emp-1", name: "Sarah Jenkins", email: "sarah.j@acme.com", avatar: "👩‍💼", organization: "Acme Corp", role: "Employee", department: "Marketing", rating: 4.9, ridesCompleted: 42 },
+      { id: "emp-2", name: "David Chen", email: "david.c@acme.com", avatar: "👨‍💻", organization: "Acme Corp", role: "Employee", department: "Engineering", rating: 4.8, ridesCompleted: 28 },
+      { id: "emp-3", name: "Elena Rodriguez", email: "elena.r@acme.com", avatar: "👩‍🔬", organization: "Acme Corp", role: "Employee", department: "R&D", rating: 4.7, ridesCompleted: 15 },
+      { id: "admin-1", name: "Marcus Vance", email: "marcus.v@acme.com", avatar: "👨‍💼", organization: "Acme Corp", role: "Administrator", department: "Operations", rating: 5.0, ridesCompleted: 0 }
+    ];
+
+    const initialVehicles = [
+      { id: "veh-1", ownerId: "emp-1", model: "Tesla Model 3 (White)", registrationNumber: "CA-88X-9002", seatingCapacity: 4, fuelType: "Electric", status: "Active" },
+      { id: "veh-2", ownerId: "emp-2", model: "Toyota Prius (Silver)", registrationNumber: "NY-77Y-1244", seatingCapacity: 3, fuelType: "Hybrid", status: "Active" }
+    ];
+
+    const initialRides = [
+      {
+        id: "ride-1",
+        driverId: "emp-1",
+        driverName: "Sarah Jenkins",
+        driverAvatar: "👩‍💼",
+        driverRating: 4.9,
+        vehicleModel: "Tesla Model 3",
+        vehicleReg: "CA-88X-9002",
+        pickup: "Downtown Hub (Main St 405)",
+        destination: "Acme HQ (Silicon Boulevard 1)",
+        dateTime: "2026-07-19T08:30:00",
+        seatsTotal: 4,
+        seatsAvailable: 3,
+        fare: 12.00,
+        status: "published",
+        recurring: false,
+        routeCoordinates: [
+          { x: 10, y: 80, label: "Downtown Hub" },
+          { x: 35, y: 70, label: "Highway 101" },
+          { x: 60, y: 45, label: "Bay Area Bridge" },
+          { x: 90, y: 20, label: "Acme HQ" }
+        ]
+      },
+      {
+        id: "ride-2",
+        driverId: "emp-2",
+        driverName: "David Chen",
+        driverAvatar: "👨‍💻",
+        driverRating: 4.8,
+        vehicleModel: "Toyota Prius",
+        vehicleReg: "NY-77Y-1244",
+        pickup: "Oakwood Residential Complex",
+        destination: "Acme HQ (Silicon Boulevard 1)",
+        dateTime: "2026-07-19T08:15:00",
+        seatsTotal: 3,
+        seatsAvailable: 3,
+        fare: 8.50,
+        status: "published",
+        recurring: true,
+        routeCoordinates: [
+          { x: 15, y: 20, label: "Oakwood Complex" },
+          { x: 50, y: 35, label: "Broadway Ave" },
+          { x: 90, y: 20, label: "Acme HQ" }
+        ]
+      }
+    ];
+
+    // --- INLINE SVG ICONS (Ensures Offline safety) ---
+    const Icon = ({ name, size = 18, color = "currentColor", style }) => {
+      const paths = {
+        compass: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />,
+        search: <g><circle cx="11" cy="11" r="8" strokeWidth="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" strokeWidth="2"/></g>,
+        plus: <g><line x1="12" y1="5" x2="12" y2="19" strokeWidth="2"/><line x1="5" y1="12" x2="19" y2="12" strokeWidth="2"/></g>,
+        car: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 001 13v3c0 .6.4 1 1 1h2m10 0a2 2 0 11-4 0m8 0a2 2 0 11-4 0" />,
+        wallet: <g><rect x="2" y="4" width="20" height="16" rx="2" strokeWidth="2"/><path d="M12 10h4v4h-4z" strokeWidth="2"/></g>,
+        history: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />,
+        settings: <g><circle cx="12" cy="12" r="3" strokeWidth="2"/><path strokeWidth="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></g>,
+        shield: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+        users: <g><path strokeWidth="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" strokeWidth="2"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></g>,
+        sliders: <g><line x1="4" y1="21" x2="4" y2="14" strokeWidth="2"/><line x1="4" y1="10" x2="4" y2="3" strokeWidth="2"/><line x1="12" y1="21" x2="12" y2="12" strokeWidth="2"/><line x1="12" y1="8" x2="12" y2="3" strokeWidth="2"/><line x1="20" y1="21" x2="20" y2="16" strokeWidth="2"/><line x1="20" y1="12" x2="20" y2="3" strokeWidth="2"/><circle cx="4" cy="12" r="2" strokeWidth="2"/><circle cx="12" cy="10" r="2" strokeWidth="2"/><circle cx="20" cy="14" r="2" strokeWidth="2"/></g>,
+        mapPin: <g><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeWidth="2"/><circle cx="12" cy="10" r="3" strokeWidth="2"/></g>,
+        clock: <g><circle cx="12" cy="12" r="10" strokeWidth="2"/><polyline points="12 6 12 12 16 14" strokeWidth="2"/></g>,
+        phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" strokeWidth="2"/>,
+        send: <g><line x1="22" y1="2" x2="11" y2="13" strokeWidth="2"/><polygon points="22 2 15 22 11 13 2 9 22 2" strokeWidth="2"/></g>
+      };
+
+      return (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          style={{ width: size, height: size, strokeWidth: 2, ...style }}
+        >
+          {paths[name] || <circle cx="12" cy="12" r="10" strokeWidth="2" />}
+        </svg>
+      );
+    };
+
+    // --- CONTEXT STATE PROVIDER ---
+    const AppContext = createContext();
+
+    const AppProvider = ({ children }) => {
+      const [currentUser, setCurrentUser] = useState(initialEmployees[1]); // Default to David Chen
+      const [currentRole, setCurrentRole] = useState('employee');
+      const [isAuthenticated, setIsAuthenticated] = useState(true);
+      const [rides, setRides] = useState(initialRides);
+      const [vehicles, setVehicles] = useState(initialVehicles);
+      const [walletBalance, setWalletBalance] = useState(45.50);
+      const [transactions, setTransactions] = useState([
+        { id: "tx-1", type: "recharge", amount: 50.00, date: "2026-07-16T14:30:00", desc: "Wallet top-up via Card" },
+        { id: "tx-2", type: "payment", amount: 12.00, date: "2026-07-17T10:15:00", desc: "Ride fare - David Chen" }
+      ]);
+      const [places, setPlaces] = useState([
+        { id: "pl-1", label: "Home", address: "742 Evergreen Terrace" },
+        { id: "pl-2", label: "Office (Acme HQ)", address: "1 Silicon Boulevard" }
+      ]);
+      const [currentView, setCurrentView] = useState('dashboard');
+      const [activeTrip, setActiveTrip] = useState(null);
+
+      useEffect(() => {
+        const active = rides.find(r => 
+          (r.passengerId === currentUser?.id || r.driverId === currentUser?.id) && 
+          ['booked', 'started', 'in_progress', 'payment_pending'].includes(r.status)
+        );
+        setActiveTrip(active || null);
+      }, [rides, currentUser]);
+
+      const login = (email) => {
+        const found = initialEmployees.find(e => e.email.toLowerCase() === email.toLowerCase());
+        if (found) {
+          setCurrentUser(found);
+          setCurrentRole(found.role === 'Administrator' ? 'admin' : 'employee');
+          setIsAuthenticated(true);
+          setCurrentView('dashboard');
+        }
+      };
+
+      const publishRide = (pickup, destination, dateTime, seats, fare, vehicleId, recurring) => {
+        const vehicle = vehicles.find(v => v.id === vehicleId);
+        const newRide = {
+          id: `ride-${Date.now()}`,
+          driverId: currentUser.id,
+          driverName: currentUser.name,
+          driverAvatar: currentUser.avatar,
+          driverRating: currentUser.rating,
+          vehicleModel: vehicle ? vehicle.model : "Vehicle",
+          vehicleReg: vehicle ? vehicle.registrationNumber : "Pending",
+          pickup,
+          destination,
+          dateTime,
+          seatsTotal: parseInt(seats, 10),
+          seatsAvailable: parseInt(seats, 10),
+          fare: parseFloat(fare),
+          status: 'published',
+          recurring: !!recurring,
+          routeCoordinates: [
+            { x: 10, y: 70, label: pickup },
+            { x: 50, y: 40, label: "Highway 1" },
+            { x: 90, y: 20, label: destination }
+          ]
+        };
+        setRides(prev => [newRide, ...prev]);
+        setCurrentView('my-trips');
+      };
+
+      const bookRide = (rideId) => {
+        setRides(prev => prev.map(ride => {
+          if (ride.id === rideId) {
+            return {
+              ...ride,
+              passengerId: currentUser.id,
+              passengerName: currentUser.name,
+              passengerAvatar: currentUser.avatar,
+              seatsAvailable: ride.seatsAvailable - 1,
+              status: 'booked'
+            };
+          }
+          return ride;
+        }));
+        setCurrentView('my-trips');
+      };
+
+      const cancelRide = (rideId) => {
+        setRides(prev => prev.map(ride => {
+          if (ride.id === rideId) {
+            return { ...ride, passengerId: null, seatsAvailable: ride.seatsAvailable + 1, status: 'published' };
+          }
+          return ride;
+        }));
+      };
+
+      const startTrip = (rideId) => {
+        setRides(prev => prev.map(ride => ride.id === rideId ? { ...ride, status: 'in_progress' } : ride));
+      };
+
+      const completeTrip = (rideId) => {
+        setRides(prev => prev.map(ride => ride.id === rideId ? { ...ride, status: 'payment_pending' } : ride));
+      };
+
+      const payTrip = (rideId, paymentMethod) => {
+        const targetRide = rides.find(r => r.id === rideId);
+        if (!targetRide) return;
+
+        if (paymentMethod === 'Wallet') {
+          if (walletBalance < targetRide.fare) {
+            alert("Insufficient wallet balance. Please recharge first.");
+            return;
+          }
+          setWalletBalance(prev => prev - targetRide.fare);
+          setTransactions(prev => [
+            {
+              id: `tx-${Date.now()}`,
+              type: 'payment',
+              amount: targetRide.fare,
+              date: new Date().toISOString(),
+              desc: `Ride from ${targetRide.pickup.split('(')[0]} to ${targetRide.destination.split('(')[0]}`
+            },
+            ...prev
+          ]);
+        }
+
+        setRides(prev => prev.map(ride => ride.id === rideId ? { ...ride, status: 'payment_completed' } : ride));
+        alert("Payment completed successfully!");
+        setCurrentView('history');
+      };
+
+      const addFunds = (amount) => {
+        const amt = parseFloat(amount);
+        setWalletBalance(prev => prev + amt);
+        setTransactions(prev => [{ id: `tx-${Date.now()}`, type: 'recharge', amount: amt, date: new Date().toISOString(), desc: "Top-up via Card" }, ...prev]);
+      };
+
+      const addVehicle = (model, regNo, capacity, fuelType) => {
+        setVehicles(prev => [...prev, { id: `veh-${Date.now()}`, ownerId: currentUser.id, model, registrationNumber: regNo, seatingCapacity: parseInt(capacity), fuelType, status: 'Active' }]);
+      };
+
+      return (
+        <AppContext.Provider value={{
+          currentUser, currentRole, isAuthenticated, rides, vehicles, walletBalance, transactions, places, currentView, activeTrip,
+          setCurrentView, switchRole: setCurrentRole, login, logout: () => setIsAuthenticated(false),
+          publishRide, bookRide, cancelRide, startTrip, completeTrip, payTrip, addFunds, addVehicle
+        }}>
+          {children}
+        </AppContext.Provider>
+      );
+    };
+
+    // --- SUB-COMPONENTS ---
+    
+    // 1. Live Map Route tracker
+    const MapMockup = ({ coordinates = [], status }) => {
+      const [progress, setProgress] = useState(0);
+      const [eta, setEta] = useState(15);
+
+      const path = coordinates.length > 0 ? coordinates : [
+        { x: 15, y: 75, label: "Start" },
+        { x: 50, y: 45, label: "Bypass" },
+        { x: 85, y: 20, label: "Destination" }
+      ];
+
+      useEffect(() => {
+        let interval;
+        if (status === 'in_progress') {
+          interval = setInterval(() => {
+            setProgress(prev => {
+              if (prev >= 1) return 1;
+              const next = prev + 0.05;
+              setEta(Math.max(1, Math.round((1 - next) * 15)));
+              return next;
+            });
+          }, 1000);
+        } else if (status === 'payment_completed' || status === 'completed') {
+          setProgress(1);
+          setEta(0);
+        } else {
+          setProgress(0);
+          setEta(15);
+        }
+        return () => clearInterval(interval);
+      }, [status]);
+
+      const getCarPosition = () => {
+        if (progress <= 0) return path[0];
+        if (progress >= 1) return path[path.length - 1];
+        const scaled = progress * (path.length - 1);
+        const idx = Math.floor(scaled);
+        const segProgress = scaled - idx;
+        const start = path[idx];
+        const end = path[idx + 1];
+        return {
+          x: start.x + (end.x - start.x) * segProgress,
+          y: start.y + (end.y - start.y) * segProgress
+        };
+      };
+
+      const car = getCarPosition();
+      const pathD = `M ${path[0].x * 4} ${path[0].y * 3} Q ${path[1].x * 4} ${path[1].y * 3} ${path[2].x * 4} ${path[2].y * 3}`;
+
+      return (
+        <div className="card" style={{ padding: '16px', background: '#f0fdf4' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+              <Icon name="compass" size={16} color="var(--primary)" /> Route Tracking
+            </h4>
+            <div className="badge badge-info">
+              <Icon name="clock" size={12} color="var(--info)" /> {status === 'in_progress' ? `ETA: ${eta}m` : 'Ready'}
+            </div>
+          </div>
+          <div style={{ position: 'relative', height: '240px', backgroundColor: '#e0f2fe', borderRadius: '12px', overflow: 'hidden', border: '1px solid #bae6fd' }}>
+            <svg style={{ width: '100%', height: '100%' }}>
+              <path d={pathD} fill="none" stroke="#cbd5e1" strokeWidth="10" strokeLinecap="round" />
+              <path d={pathD} fill="none" stroke="#ffffff" strokeWidth="6" strokeDasharray="4,4" />
+              
+              {/* Pins */}
+              <circle cx={path[0].x * 4} cy={path[0].y * 3} r="12" fill="rgba(59,130,246,0.2)" className="map-pulse" />
+              <circle cx={path[0].x * 4} cy={path[0].y * 3} r="6" fill="#3b82f6" />
+              
+              <circle cx={path[2].x * 4} cy={path[2].y * 3} r="12" fill="rgba(16,185,129,0.2)" className="map-pulse" />
+              <circle cx={path[2].x * 4} cy={path[2].y * 3} r="6" fill="#10b981" />
+
+              {/* Car Icon */}
+              <g transform={`translate(${car.x * 4 - 15}, ${car.y * 3 - 15})`}>
+                <foreignObject width="30" height="30">
+                  <div style={{ fontSize: '20px' }}>🚗</div>
+                </foreignObject>
+              </g>
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    // 2. Chat Simulator
+    const ChatSim = ({ partnerName }) => {
+      const [messages, setMessages] = useState([
+        { sender: "driver", text: "I have arrived at the corporate gate.", time: "08:28" }
+      ]);
+      const [input, setInput] = useState("");
+
+      const handleSend = (e) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+        setMessages(prev => [...prev, { sender: "passenger", text: input, time: "Now" }]);
+        setInput("");
+        setTimeout(() => {
+          setMessages(prev => [...prev, { sender: "driver", text: "Excellent, see you in a bit!", time: "Now" }]);
+        }, 1200);
+      };
+
+      return (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '320px', padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '10px' }}>
+            <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>Chat: {partnerName}</span>
+            <button className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem' }} onClick={() => alert("Calling coworker via secure gateway...")}>
+              <Icon name="phone" size={12} /> Call
+            </button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{ alignSelf: m.sender === 'passenger' ? 'flex-end' : 'flex-start', background: m.sender === 'passenger' ? 'var(--primary)' : 'var(--surface-hover)', color: m.sender === 'passenger' ? '#fff' : '#000', padding: '8px 12px', borderRadius: '12px', fontSize: '0.8rem', maxWidth: '80%' }}>
+                {m.text}
+              </div>
+            ))}
+          </div>
+          <form onSubmit={handleSend} style={{ display: 'flex', gap: '8px' }}>
+            <input type="text" className="input-field" style={{ margin: 0, padding: '8px' }} value={input} onChange={e => setInput(e.target.value)} placeholder="Type a message..." />
+            <button type="submit" className="btn btn-primary" style={{ padding: '8px' }}><Icon name="send" size={14} color="#fff" /></button>
+          </form>
+        </div>
+      );
+    };
+
+    // --- MAIN VIEWS ---
+
+    // 1. Employee Dashboard view
+    const DashboardView = () => {
+      const { setCurrentView, walletBalance, activeTrip } = useContext(AppContext);
+      return (
+        <div className="view-container animate-fade">
+          <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #7e22ce 100%)', padding: '24px', borderRadius: '12px', color: '#fff', marginBottom: '24px' }}>
+            <h2 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: '800' }}>Enterprise Commute Shared Circle</h2>
+            <p style={{ opacity: 0.9, fontSize: '0.9rem', marginTop: '6px' }}>Verified rides inside your corporate domain.</p>
+          </div>
+
+          <div className="grid-2" style={{ marginBottom: '24px' }}>
+            <div className="card card-interactive" onClick={() => setCurrentView('find-ride')}>
+              <Icon name="search" size={32} color="var(--primary)" />
+              <h3 style={{ marginTop: '12px', marginBottom: '6px' }}>Find a Ride</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Join colleague commutes along your route.</p>
+            </div>
+            <div className="card card-interactive" onClick={() => setCurrentView('offer-ride')}>
+              <Icon name="plus" size={32} color="var(--primary)" />
+              <h3 style={{ marginTop: '12px', marginBottom: '6px' }}>Offer a Ride</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Host carpool rides, publish routes, and share costs.</p>
+            </div>
+          </div>
+
+          <div className="grid-3">
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Icon name="wallet" size={24} color="var(--success)" />
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Wallet balance</span>
+                <h4 style={{ fontSize: '1.2rem' }}>${walletBalance.toFixed(2)}</h4>
+              </div>
+            </div>
+
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Icon name="car" size={24} color="var(--primary)" />
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Booking</span>
+                <h4 style={{ fontSize: '0.85rem' }}>{activeTrip ? `Active: ${activeTrip.status}` : 'None'}</h4>
+              </div>
+              {activeTrip && <button className="btn btn-primary" style={{ padding: '4px 8px', fontSize: '0.7rem' }} onClick={() => setCurrentView('my-trips')}>Track</button>}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 2. Find Ride search views
+    const FindRideView = () => {
+      const { rides, bookRide } = useContext(AppContext);
+      const [step, setStep] = useState('search');
+      const [pickup, setPickup] = useState('Downtown Hub');
+      const [destination, setDestination] = useState('Acme HQ');
+
+      return (
+        <div className="view-container animate-fade">
+          <h2 style={{ marginBottom: '16px' }}>Find a Ride</h2>
+
+          {step === 'search' && (
+            <div className="card" style={{ maxWidth: '480px' }}>
+              <div className="input-group">
+                <label className="input-label">Pickup</label>
+                <input type="text" className="input-field" value={pickup} onChange={e=>setPickup(e.target.value)} />
+              </div>
+              <div className="input-group">
+                <label className="input-label">Destination</label>
+                <input type="text" className="input-field" value={destination} onChange={e=>setDestination(e.target.value)} />
+              </div>
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => setStep('confirm')}>Compute Route</button>
+            </div>
+          )}
+
+          {step === 'confirm' && (
+            <div className="grid-2">
+              <MapMockup status="booked" />
+              <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <h3>Route Confirmed</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>Estimated Distance: 14.5 km. ETA: 26 mins.</p>
+                </div>
+                <button className="btn btn-primary" onClick={() => setStep('results')}>Confirm & Search Matching Rides</button>
+              </div>
+            </div>
+          )}
+
+          {step === 'results' && (
+            <div>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Found matching rides:</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                {rides.filter(r => r.status === 'published').map(r => (
+                  <div key={r.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <strong>{r.driverAvatar} {r.driverName}</strong>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Route: {r.pickup} ➔ {r.destination}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <span style={{ fontWeight: '800', color: 'var(--primary)' }}>${r.fare.toFixed(2)}</span>
+                      <button className="btn btn-primary" onClick={() => bookRide(r.id)}>Book Seat</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // 3. Offer Ride views
+    const OfferRideView = () => {
+      const { vehicles, publishRide } = useContext(AppContext);
+      const [pickup, setPickup] = useState('Oakwood Residences');
+      const [destination, setDestination] = useState('Acme HQ');
+      const [seats, setSeats] = useState('3');
+      const [fare, setFare] = useState('9.00');
+
+      const handlePublish = () => {
+        publishRide(pickup, destination, new Date().toISOString(), seats, fare, vehicles[0]?.id || 'veh-1');
+        alert("Carpool ride published successfully!");
+      };
+
+      return (
+        <div className="view-container animate-fade">
+          <h2 style={{ marginBottom: '16px' }}>Offer a Ride</h2>
+          <div className="card" style={{ maxWidth: '480px' }}>
+            <div className="input-group">
+              <label className="input-label">Pickup Location</label>
+              <input type="text" className="input-field" value={pickup} onChange={e=>setPickup(e.target.value)} />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Destination</label>
+              <input type="text" className="input-field" value={destination} onChange={e=>setDestination(e.target.value)} />
+            </div>
+            <div className="grid-2">
+              <div className="input-group">
+                <label className="input-label">Seats Offered</label>
+                <input type="number" className="input-field" value={seats} onChange={e=>setSeats(e.target.value)} />
+              </div>
+              <div className="input-group">
+                <label className="input-label">Fare ($)</label>
+                <input type="number" className="input-field" value={fare} onChange={e=>setFare(e.target.value)} />
+              </div>
+            </div>
+            <button className="btn btn-primary" style={{ width: '100%' }} onClick={handlePublish}>Publish Commute Ride</button>
+          </div>
+        </div>
+      );
+    };
+
+    // 4. My Trips tracking views
+    const MyTripsView = () => {
+      const { activeTrip, startTrip, completeTrip, payTrip, currentUser } = useContext(AppContext);
+      const [method, setMethod] = useState('Wallet');
+
+      if (!activeTrip) {
+        return (
+          <div className="view-container">
+            <h2>No Active Commutes</h2>
+            <div className="card" style={{ textAlign: 'center', padding: '40px', marginTop: '20px' }}>
+              <p style={{ color: 'var(--text-muted)' }}>You do not have any active booked or published rides.</p>
+            </div>
+          </div>
+        );
+      }
+
+      const isDriver = activeTrip.driverId === currentUser.id;
+
+      return (
+        <div className="view-container animate-fade">
+          <h2>Active Trip Dashboard</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '7fr 5fr', gap: '24px', marginTop: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <MapMockup coordinates={activeTrip.routeCoordinates} status={activeTrip.status} />
+              
+              <div className="card">
+                <h3>Commute Actions</h3>
+                <div style={{ marginTop: '16px' }}>
+                  {isDriver ? (
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      {activeTrip.status === 'booked' && (
+                        <button className="btn btn-primary" onClick={() => startTrip(activeTrip.id)}>Start Ride (Move car)</button>
+                      )}
+                      {activeTrip.status === 'in_progress' && (
+                        <button className="btn btn-success" style={{ background: 'var(--success)', color: '#fff' }} onClick={() => completeTrip(activeTrip.id)}>Complete Commute</button>
+                      )}
+                      {activeTrip.status === 'payment_pending' && <span>Waiting for passenger payment.</span>}
+                    </div>
+                  ) : (
+                    <div>
+                      {activeTrip.status === 'booked' && <span>Waiting for driver to launch vehicle...</span>}
+                      {activeTrip.status === 'in_progress' && <span>Commute is active. Track progress on the map.</span>}
+                      {activeTrip.status === 'payment_pending' && (
+                        <div style={{ background: '#eff6ff', padding: '16px', borderRadius: '8px' }}>
+                          <h4>Pending Fare: ${activeTrip.fare.toFixed(2)}</h4>
+                          <select className="input-field" style={{ margin: '8px 0' }} value={method} onChange={e=>setMethod(e.target.value)}>
+                            <option value="Wallet">Wallet Balance</option>
+                            <option value="Card">Credit Card</option>
+                            <option value="Cash">Cash payment</option>
+                          </select>
+                          <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => payTrip(activeTrip.id, method)}>Complete payment</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <ChatSim partnerName={isDriver ? (activeTrip.passengerName || "Passenger") : activeTrip.driverName} />
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 5. Wallet manager
+    const WalletView = () => {
+      const { walletBalance, transactions, addFunds } = useContext(AppContext);
+      const [amt, setAmt] = useState('');
+
+      return (
+        <div className="view-container animate-fade">
+          <h2>Wallet & Transaction Ledger</h2>
+          <div className="grid-2" style={{ marginTop: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #7c5b70 100%)', color: '#fff' }}>
+                <span style={{ fontSize: '0.8rem', color: '#eee' }}>Sandbox Balance</span>
+                <h1 style={{ color: '#fff', fontSize: '2.5rem', margin: '6px 0' }}>${walletBalance.toFixed(2)}</h1>
+              </div>
+
+              <div className="card">
+                <h3>Add Sandbox Funds</h3>
+                <div style={{ display: 'flex', gap: '8px', margin: '12px 0' }}>
+                  <button className="btn btn-secondary" onClick={()=>addFunds(10)}>+$10</button>
+                  <button className="btn btn-secondary" onClick={()=>addFunds(25)}>+$25</button>
+                  <button className="btn btn-secondary" onClick={()=>addFunds(50)}>+$50</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <h3>Transactions ledger</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+                {transactions.map((tx, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px solid var(--border)' }}>
+                    <span>{tx.desc}</span>
+                    <strong style={{ color: tx.type === 'recharge' ? 'var(--success)' : 'var(--danger)' }}>
+                      {tx.type === 'recharge' ? '+' : '-'}${tx.amount.toFixed(2)}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 6. Vehicle manager
+    const VehiclesView = () => {
+      const { vehicles, addVehicle } = useContext(AppContext);
+      const [model, setModel] = useState('');
+      const [reg, setReg] = useState('');
+
+      const handleAdd = (e) => {
+        e.preventDefault();
+        if (!model || !reg) return;
+        addVehicle(model, reg, 4, 'Hybrid');
+        setModel(''); setReg('');
+        alert("Vehicle registered!");
+      };
+
+      return (
+        <div className="view-container animate-fade">
+          <h2>My Commute Vehicles</h2>
+          <div className="grid-2" style={{ marginTop: '20px' }}>
+            <div className="card">
+              <h3>Register vehicle</h3>
+              <form onSubmit={handleAdd} style={{ marginTop: '12px' }}>
+                <div className="input-group">
+                  <label className="input-label">Model Name</label>
+                  <input type="text" className="input-field" value={model} onChange={e=>setModel(e.target.value)} placeholder="e.g. Toyota Camry" />
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Plate / Reg No</label>
+                  <input type="text" className="input-field" value={reg} onChange={e=>setReg(e.target.value)} placeholder="e.g. CA-99X-11" />
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Save Vehicle</button>
+              </form>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {vehicles.map(v => (
+                <div key={v.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong>{v.model}</strong>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Reg: {v.registrationNumber} • Fuel: {v.fuelType}</div>
+                  </div>
+                  <span className="badge badge-success">Verified</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 7. History View
+    const HistoryView = () => {
+      const { rides, currentUser } = useContext(AppContext);
+      const finished = rides.filter(r => (r.driverId === currentUser.id || r.passengerId === currentUser.id) && r.status === 'payment_completed');
+
+      return (
+        <div className="view-container animate-fade">
+          <h2>Ride History Ledger</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>
+            {finished.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)' }}>No completed commutes logged.</p>
+            ) : (
+              finished.map(r => (
+                <div key={r.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong>{r.pickup.split('(')[0]} ➔ {r.destination.split('(')[0]}</strong>
+                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Driver: {r.driverName}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--primary)' }}>${r.fare.toFixed(2)}</span>
+                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--success)' }}>Completed</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // 8. Reports View
+    const ReportsView = () => {
+      return (
+        <div className="view-container animate-fade">
+          <h2>Reports & Analytics</h2>
+          <div className="grid-3" style={{ marginTop: '20px' }}>
+            <div className="card">
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Distance travelled</span>
+              <h3>248 km</h3>
+            </div>
+            <div className="card">
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>CO₂ Savings</span>
+              <h3 style={{ color: 'var(--success)' }}>48.5 kg CO₂</h3>
+            </div>
+            <div className="card">
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cost saved</span>
+              <h3>$112.40</h3>
+            </div>
+          </div>
+
+          <div className="card" style={{ marginTop: '24px' }}>
+            <h3>Weekly fuel saving index</h3>
+            <div style={{ height: '140px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '12px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '16px' }}>
+              {[30, 45, 60, 20, 80].map((h, i) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                  <div style={{ width: '24px', height: `${h}px`, background: 'var(--primary)', borderRadius: '4px' }}></div>
+                  <span style={{ fontSize: '0.75rem' }}>Day {i+1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 9. Settings View
+    const SettingsView = () => {
+      const { currentUser, places } = useContext(AppContext);
+      return (
+        <div className="view-container animate-fade">
+          <h2>Settings</h2>
+          <div className="grid-2" style={{ marginTop: '20px' }}>
+            <div className="card">
+              <h3>Profile Info</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px', fontSize: '0.85rem' }}>
+                <div>Name: <strong>{currentUser?.name}</strong></div>
+                <div>Email: <strong>{currentUser?.email}</strong></div>
+                <div>Organization: <strong>{currentUser?.organization}</strong></div>
+              </div>
+            </div>
+
+            <div className="card">
+              <h3>Saved places</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
+                {places.map(p => (
+                  <div key={p.id} style={{ padding: '8px', border: '1px solid var(--border)', borderRadius: '6px', background: '#fafafa', fontSize: '0.8rem' }}>
+                    <strong>{p.label}:</strong> {p.address}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 10. Admin Control Room
+    const AdminView = () => {
+      const { currentView, vehicles } = useContext(AppContext);
+      return (
+        <div className="view-container animate-fade">
+          <h2>Admin Control Room: Acme Corp</h2>
+          
+          {currentView === 'admin-dashboard' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
+              <div className="grid-3">
+                <div className="card">
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Registered employees</span>
+                  <h3>128 Users</h3>
+                </div>
+                <div className="card">
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Commuters</span>
+                  <h3>34 Active</h3>
+                </div>
+                <div className="card">
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active fleet</span>
+                  <h3>12 Vehicles</h3>
+                </div>
+              </div>
+
+              <div className="card">
+                <h3>Admin Log Records</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  <div>• David Chen booked seat for July 19 commute.</div>
+                  <div>• Sarah Jenkins registered Tesla Model 3.</div>
+                  <div>• Configuration updated: Per km base cost changed to $0.15.</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentView === 'admin-employees' && (
+            <div className="card" style={{ marginTop: '20px' }}>
+              <h3>Employee roster</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                {initialEmployees.map(emp => (
+                  <div key={emp.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px solid var(--border)' }}>
+                    <span>{emp.name} ({emp.email})</span>
+                    <span className="badge badge-success">Approved Access</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentView === 'admin-vehicles' && (
+            <div className="card" style={{ marginTop: '20px' }}>
+              <h3>Audited fleet vehicles</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                {vehicles.map(v => (
+                  <div key={v.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px solid var(--border)' }}>
+                    <span>{v.model} ({v.registrationNumber})</span>
+                    <span className="badge badge-success">Safety Audited</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentView === 'admin-config' && (
+            <div className="card" style={{ maxWidth: '480px', marginTop: '20px' }}>
+              <h3>Travel Configurations</h3>
+              <div style={{ marginTop: '12px' }}>
+                <div className="input-group">
+                  <label className="input-label">Fuel base index ($/Litre)</label>
+                  <input type="number" className="input-field" defaultValue="1.25" />
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Employee travel base cost ($/km)</label>
+                  <input type="number" className="input-field" defaultValue="0.15" />
+                </div>
+                <button className="btn btn-primary" style={{ width: '100%' }} onClick={()=>alert("Parameters saved!")}>Save Configurations</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // --- MAIN APP CONTROLLER ---
+    const Sidebar = () => {
+      const { currentRole, currentView, setCurrentView, currentUser, logout, activeTrip } = useContext(AppContext);
+      
+      const empMenu = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'compass' },
+        { id: 'find-ride', label: 'Find a Ride', icon: 'search' },
+        { id: 'offer-ride', label: 'Offer a Ride', icon: 'plus' },
+        { id: 'my-trips', label: 'My Trips', icon: 'car', badge: activeTrip ? 'Active' : null },
+        { id: 'wallet', label: 'Wallet & Payments', icon: 'wallet' },
+        { id: 'vehicles', label: 'My Vehicles', icon: 'car' },
+        { id: 'history', label: 'Ride History', icon: 'history' },
+        { id: 'settings', label: 'Settings', icon: 'settings' }
+      ];
+
+      const admMenu = [
+        { id: 'admin-dashboard', label: 'Overview', icon: 'compass' },
+        { id: 'admin-employees', label: 'Manage Employees', icon: 'users' },
+        { id: 'admin-vehicles', label: 'Manage Vehicles', icon: 'car' },
+        { id: 'admin-config', label: 'Platform Config', icon: 'sliders' }
+      ];
+
+      const menu = currentRole === 'admin' ? admMenu : empMenu;
+
+      return (
+        <aside style={{ width: '260px', backgroundColor: '#fff', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', height: '100%', flexShrink: 0 }}>
+          <div style={{ height: '70px', display: 'flex', alignItems: 'center', padding: '0 20px', borderBottom: '1px solid var(--border)', gap: '8px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>O</div>
+            <span style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--primary)' }}>odoo carpool</span>
+          </div>
+
+          <div style={{ margin: '12px 16px 4px', padding: '6px 12px', borderRadius: '6px', backgroundColor: currentRole === 'admin' ? '#fef2f2' : 'var(--primary-light)', border: `1px solid ${currentRole === 'admin' ? '#fca5a5' : 'var(--primary-border)'}`, fontSize: '0.75rem', fontWeight: '600', color: currentRole === 'admin' ? '#dc2626' : 'var(--primary)' }}>
+            Mode: {currentRole === 'admin' ? 'Company Admin' : 'Employee Access'}
+          </div>
+
+          <nav style={{ flex: 1, padding: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {menu.map(item => (
+              <button key={item.id} onClick={() => setCurrentView(item.id)} className="btn btn-ghost" style={{ width: '100%', justifyContent: 'space-between', padding: '8px 12px', background: currentView === item.id ? 'var(--primary-light)' : 'transparent', color: currentView === item.id ? 'var(--primary)' : 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Icon name={item.icon} size={16} color={currentView === item.id ? 'var(--primary)' : 'var(--text-light)'} />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && <span className="badge badge-success pulse-soft" style={{ fontSize: '0.6rem', padding: '2px 6px' }}>{item.badge}</span>}
+              </button>
+            ))}
+          </nav>
+
+          <div style={{ padding: '16px', borderTop: '1px solid var(--border)', backgroundColor: '#fafafa', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.5rem' }}>{currentUser?.avatar}</span>
+            <div style={{ flex: 1 }}>
+              <h5 style={{ fontSize: '0.8rem', margin: 0 }}>{currentUser?.name}</h5>
+              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{currentUser?.email}</span>
+            </div>
+          </div>
+        </aside>
+      );
+    };
+
+    const AppContent = () => {
+      const { currentView, currentRole, switchRole, addFunds, walletBalance, currentUser } = useContext(AppContext);
+      const [showConsole, setShowConsole] = useState(true);
+
+      const renderView = () => {
+        switch (currentView) {
+          case 'dashboard': return <DashboardView />;
+          case 'find-ride': return <FindRideView />;
+          case 'offer-ride': return <OfferRideView />;
+          case 'my-trips': return <MyTripsView />;
+          case 'wallet': return <WalletView />;
+          case 'vehicles': return <VehiclesView />;
+          case 'history': return <HistoryView />;
+          case 'settings': return <SettingsView />;
+          case 'admin-dashboard':
+          case 'admin-employees':
+          case 'admin-vehicles':
+          case 'admin-config':
+            return <AdminView />;
+          default: return <DashboardView />;
+        }
+      };
+
+      return (
+        <div className="app-container">
+          <Sidebar />
+          <div className="main-content">
+            <header className="top-bar">
+              <h3>{currentRole === 'admin' ? 'Company Control Room' : 'Corporate Commute Hub'}</h3>
+              <div style={{ padding: '6px 12px', borderRadius: '20px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '700' }}>
+                Wallet Balance: ${walletBalance.toFixed(2)}
+              </div>
+            </header>
+            <main style={{ flex: 1, overflowY: 'auto' }}>
+              {renderView()}
+            </main>
+          </div>
+
+          {/* Floating Sandbox Console */}
+          {showConsole && (
+            <div className="glass-panel" style={{ position: 'fixed', bottom: '20px', right: '20px', width: '300px', padding: '16px', borderRadius: '12px', boxShadow: 'var(--shadow-xl)', border: '1px solid var(--primary-border)', zIndex: 999 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontWeight: '700', fontSize: '0.8rem', color: 'var(--primary)' }}>✨ Quick Demo Switcher</span>
+                <button onClick={() => setShowConsole(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--text-light)' }}>Hide</button>
+              </div>
+              <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '10px' }}>Swap positions instantly to preview all sections of the spec.</p>
+              
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <button className={`btn ${currentRole === 'employee' ? 'btn-primary' : 'btn-secondary'}`} style={{ flex: 1, padding: '4px', fontSize: '0.7rem' }} onClick={()=>switchRole('employee')}>Employee</button>
+                <button className={`btn ${currentRole === 'admin' ? 'btn-primary' : 'btn-secondary'}`} style={{ flex: 1, padding: '4px', fontSize: '0.7rem' }} onClick={()=>switchRole('admin')}>Admin</button>
+              </div>
+              <button className="btn btn-secondary" style={{ width: '100%', padding: '6px', fontSize: '0.7rem' }} onClick={()=>addFunds(50)}>Add $50 Sandbox Funds</button>
+            </div>
+          )}
+
+          {!showConsole && (
+            <button onClick={() => setShowConsole(true)} style={{ position: 'fixed', bottom: '20px', right: '20px', width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-lg)', zIndex: 999 }}>✨</button>
+          )}
+        </div>
+      );
+    };
+
+    const Root = () => (
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    );
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<Root />);
+  </script>
+</body>
+</html>
