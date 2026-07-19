@@ -59,8 +59,8 @@ export const validateFutureDateTime = (value, fieldLabel = 'Departure time') => 
 export const validateFare = (fare) => {
   const n = parseFloat(fare);
   if (Number.isNaN(n)) return 'Fare must be a number.';
-  if (n <= 0) return 'Fare must be greater than $0.';
-  if (n > 500) return 'Fare cannot exceed $500 per seat.';
+  if (n <= 0) return 'Fare must be greater than ₹0.';
+  if (n > 5000) return 'Fare cannot exceed ₹5000 per seat.';
   return null;
 };
 
@@ -95,8 +95,8 @@ export const validateRegistration = (regNo, existingVehicles = []) => {
 export const validateAmount = (amount, { min = 1, max = 10000 } = {}) => {
   const n = parseFloat(amount);
   if (Number.isNaN(n)) return 'Amount must be a number.';
-  if (n < min) return `Minimum amount is $${min.toFixed(2)}.`;
-  if (n > max) return `Maximum amount is $${max.toLocaleString()}.`;
+  if (n < min) return `Minimum amount is ₹${min.toFixed(2)}.`;
+  if (n > max) return `Maximum amount is ₹${max.toLocaleString()}.`;
   return null;
 };
 
@@ -116,9 +116,9 @@ export const validatePlace = (label, address, existingPlaces = []) => {
 
 export const validateOrgConfig = ({ fuelCost, costKm, tolerance }) => {
   const fuel = parseFloat(fuelCost);
-  if (Number.isNaN(fuel) || fuel <= 0 || fuel > 20) return 'Fuel cost must be between $0.01 and $20.00 per litre.';
+  if (Number.isNaN(fuel) || fuel <= 0 || fuel > 500) return 'Fuel cost must be between ₹1 and ₹500 per litre.';
   const km = parseFloat(costKm);
-  if (Number.isNaN(km) || km <= 0 || km > 10) return 'Cost per km must be between $0.01 and $10.00.';
+  if (Number.isNaN(km) || km <= 0 || km > 100) return 'Cost per km must be between ₹0.5 and ₹100.';
   const tol = parseInt(tolerance, 10);
   if (Number.isNaN(tol) || tol < 50 || tol > 5000) return 'Matching tolerance must be between 50 and 5000 meters.';
   return null;

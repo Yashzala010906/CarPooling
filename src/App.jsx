@@ -91,7 +91,7 @@ function AppContent() {
               alignItems: 'center',
               gap: '6px'
             }}>
-              💰 Wallet Balance: ${walletBalance.toFixed(2)}
+              💰 Wallet Balance: ₹{walletBalance.toFixed(2)}
             </div>
           </div>
         </header>

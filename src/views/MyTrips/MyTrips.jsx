@@ -85,7 +85,7 @@ export default function MyTrips() {
               
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>ESTIMATED FARE</span>
-                <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>${activeTrip.fare.toFixed(2)}</strong>
+                <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>₹{activeTrip.fare.toFixed(2)}</strong>
               </div>
 
               <div style={{ gridColumn: 'span 2' }}>
@@ -183,7 +183,7 @@ export default function MyTrips() {
                       </div>
 
                       <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                        Pay ${activeTrip.fare.toFixed(2)} Now
+                        Pay ₹{activeTrip.fare.toFixed(2)} Now
                       </button>
                     </form>
                   )}

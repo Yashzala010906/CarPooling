@@ -418,7 +418,7 @@ export default function FindRide() {
                     <div style={{ textAlign: 'right' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fare per seat</span>
                       <div style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--primary)' }}>
-                        ${ride.fare.toFixed(2)}
+                        ₹{ride.fare.toFixed(2)}
                       </div>
                     </div>
                     <button onClick={() => handleBook(ride.id)} className="btn btn-primary" style={{ padding: '10px 20px' }}>

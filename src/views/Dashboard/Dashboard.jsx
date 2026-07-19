@@ -97,7 +97,7 @@ export default function Dashboard() {
           </div>
           <div style={{ flex: 1 }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Wallet Balance</span>
-            <h4 style={{ fontSize: '1.4rem', fontWeight: '700' }}>${walletBalance.toFixed(2)}</h4>
+            <h4 style={{ fontSize: '1.4rem', fontWeight: '700' }}>₹{walletBalance.toFixed(2)}</h4>
           </div>
           <button onClick={() => setCurrentView('wallet')} className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
             Recharge

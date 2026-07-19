@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { CreditCard, ArrowDownLeft, ArrowUpRight, DollarSign, Wallet as WalletIcon, Lock } from 'lucide-react';
+import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon, Lock } from 'lucide-react';
 import { validateAmount } from '../../lib/validation';
 
 export default function Wallet() {
@@ -12,7 +12,7 @@ export default function Wallet() {
     e.preventDefault();
     setRechargeError('');
 
-    const invalid = validateAmount(rechargeAmt, { min: 1, max: 10000 });
+    const invalid = validateAmount(rechargeAmt, { min: 1, max: 100000 });
     if (invalid) {
       setRechargeError(invalid);
       return;
@@ -20,13 +20,13 @@ export default function Wallet() {
 
     addFunds(rechargeAmt);
     setRechargeAmt('');
-    alert(`Successfully loaded $${parseFloat(rechargeAmt).toFixed(2)} into your Wallet!`);
+    alert(`Successfully loaded ₹${parseFloat(rechargeAmt).toFixed(2)} into your Wallet!`);
   };
 
   const handleQuickAdd = (amt) => {
     setRechargeError('');
     addFunds(amt);
-    alert(`Successfully loaded $${amt.toFixed(2)} into your Wallet!`);
+    alert(`Successfully loaded ₹${amt.toFixed(2)} into your Wallet!`);
   };
 
   return (
@@ -56,7 +56,7 @@ export default function Wallet() {
                 AVAILABLE BALANCE
               </span>
               <h1 style={{ color: '#ffffff', fontSize: '2.5rem', fontWeight: '800', margin: '4px 0' }}>
-                ${walletBalance.toFixed(2)}
+                ₹{walletBalance.toFixed(2)}
               </h1>
               <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Active Sandbox Account</span>
             </div>
@@ -69,15 +69,15 @@ export default function Wallet() {
             
             {/* Quick add buttons */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-              {[10, 25, 50].map(amt => (
+              {[100, 200, 500, 1000].map(amt => (
                 <button
                   key={amt}
                   type="button"
                   onClick={() => handleQuickAdd(amt)}
                   className="btn btn-secondary"
-                  style={{ flex: 1, padding: '8px' }}
+                  style={{ flex: 1, padding: '8px', fontSize: '0.8rem' }}
                 >
-                  +${amt}
+                  +₹{amt}
                 </button>
               ))}
             </div>
@@ -89,16 +89,16 @@ export default function Wallet() {
                 </div>
               )}
               <div className="input-group">
-                <label className="input-label">Custom Recharge Amount ($)</label>
+                <label className="input-label">Custom Recharge Amount (₹)</label>
                 <div style={{ position: 'relative' }}>
-                  <DollarSign size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
+                  <span style={{ position: 'absolute', left: '14px', top: '12px', color: 'var(--text-light)', fontWeight: 'bold' }}>₹</span>
                   <input
                     type="number"
                     min="1"
                     step="1"
                     value={rechargeAmt}
                     onChange={(e) => setRechargeAmt(e.target.value)}
-                    placeholder="Enter amount (e.g. 100)"
+                    placeholder="Enter amount (e.g. 500)"
                     className="input-field"
                     style={{ paddingLeft: '32px' }}
                     required
@@ -129,7 +129,6 @@ export default function Wallet() {
               </p>
             ) : (
               transactions.map(tx => {
-                // 'recharge' and 'earning' are incoming; 'payment' is outgoing
                 const isRecharge = tx.type !== 'payment';
                 return (
                   <div key={tx.id} style={{
@@ -166,7 +165,7 @@ export default function Wallet() {
                       fontSize: '0.9rem',
                       color: isRecharge ? 'var(--success)' : 'var(--danger)'
                     }}>
-                      {isRecharge ? '+' : '-'}${tx.amount.toFixed(2)}
+                      {isRecharge ? '+' : '-'}₹{tx.amount.toFixed(2)}
                     </span>
                   </div>
                 );

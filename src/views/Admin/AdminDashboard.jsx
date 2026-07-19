@@ -223,12 +223,12 @@ export default function AdminDashboard() {
             )}
             <div className="grid-2">
               <div className="input-group">
-                <label className="input-label">Fuel Cost Per Litre ($)</label>
+                <label className="input-label">Fuel Cost Per Litre (₹)</label>
                 <div style={{ position: 'relative' }}>
-                  <DollarSign size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
+                  <span style={{ position: 'absolute', left: '14px', top: '12px', color: 'var(--text-light)', fontWeight: 'bold' }}>₹</span>
                   <input
                     type="number"
-                    step="0.05"
+                    step="0.5"
                     value={fuelCost}
                     onChange={(e) => setFuelCost(e.target.value)}
                     className="input-field"
@@ -239,12 +239,12 @@ export default function AdminDashboard() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Travel Cost Per Km ($)</label>
+                <label className="input-label">Travel Cost Per Km (₹)</label>
                 <div style={{ position: 'relative' }}>
-                  <DollarSign size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
+                  <span style={{ position: 'absolute', left: '14px', top: '12px', color: 'var(--text-light)', fontWeight: 'bold' }}>₹</span>
                   <input
                     type="number"
-                    step="0.01"
+                    step="0.5"
                     value={costKm}
                     onChange={(e) => setCostKm(e.target.value)}
                     className="input-field"

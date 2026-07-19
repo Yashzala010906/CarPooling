@@ -187,15 +187,15 @@ export default function OfferRide() {
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label">Fare Per Seat ($)</label>
+                  <label className="input-label">Fare Per Seat (₹)</label>
                   <div style={{ position: 'relative' }}>
-                    <DollarSign size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
+                    <span style={{ position: 'absolute', left: '14px', top: '12px', color: 'var(--text-light)', fontWeight: 'bold' }}>₹</span>
                     <input
                       type="number"
-                      step="0.50"
+                      step="1"
                       value={fare}
                       onChange={(e) => setFare(e.target.value)}
-                      placeholder="e.g. 5.00"
+                      placeholder="e.g. 50"
                       className="input-field"
                       style={{ paddingLeft: '32px' }}
                       required
@@ -287,7 +287,7 @@ export default function OfferRide() {
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fare per Passenger</span>
-                  <p style={{ fontSize: '1.1rem', fontWeight: '700' }}>${parseFloat(fare).toFixed(2)}</p>
+                  <p style={{ fontSize: '1.1rem', fontWeight: '700' }}>₹{parseFloat(fare).toFixed(2)}</p>
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Timing</span>

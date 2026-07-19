@@ -70,7 +70,7 @@ export default function RideHistory() {
                 {/* Price & Badge */}
                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
                   <span style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '1.2rem' }}>
-                    ${ride.fare.toFixed(2)}
+                    ₹{ride.fare.toFixed(2)}
                   </span>
                   <span className="badge badge-success" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', padding: '2px 8px' }}>
                     <CheckCircle2 size={10} /> Paid

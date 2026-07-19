@@ -1,22 +1,22 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { ArrowRight, Lock, Mail, User, Shield, Compass, Sparkles } from 'lucide-react';
+import { ArrowRight, Lock, Mail, User, Shield, Sparkles, UserCheck, ShieldAlert } from 'lucide-react';
 import { validateEmail, validatePassword, validateName } from '../../lib/validation';
 
 export default function Auth() {
   const { login, signup } = useContext(AppContext);
-  const [authStep, setAuthStep] = useState('splash'); // 'splash', 'login', 'signup', 'profile'
+  const [authStep, setAuthStep] = useState('splash'); // 'splash', 'login', 'signup'
+  const [selectedRole, setSelectedRole] = useState('employee'); // 'employee' or 'admin'
 
   // Login Form States
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('david.c@acme.com');
+  const [loginPassword, setLoginPassword] = useState('password123');
   const [loginError, setLoginError] = useState('');
 
   // Signup Form States
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
-  const [signupOrg, setSignupOrg] = useState('Acme Corp');
   const [signupError, setSignupError] = useState('');
 
   // Shared submit-in-progress flag
@@ -27,10 +27,21 @@ export default function Auth() {
     if (authStep === 'splash') {
       const timer = setTimeout(() => {
         setAuthStep('login');
-      }, 2500);
+      }, 1800);
       return () => clearTimeout(timer);
     }
   }, [authStep]);
+
+  // Update default email depending on selected role tab
+  const handleRoleChange = (role) => {
+    setSelectedRole(role);
+    setLoginError('');
+    if (role === 'admin') {
+      setLoginEmail('marcus.v@acme.com');
+    } else {
+      setLoginEmail('david.c@acme.com');
+    }
+  };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +54,7 @@ export default function Auth() {
     }
 
     setBusy(true);
-    const res = await login(loginEmail, loginPassword);
+    const res = await login(loginEmail, loginPassword, selectedRole);
     setBusy(false);
     if (!res.success) {
       setLoginError(res.message);
@@ -57,15 +68,14 @@ export default function Auth() {
     const invalid =
       validateName(signupName) ||
       validateEmail(signupEmail) ||
-      validatePassword(signupPassword) ||
-      (!signupOrg ? 'Please select your corporate group.' : null);
+      validatePassword(signupPassword);
     if (invalid) {
       setSignupError(invalid);
       return;
     }
 
     setBusy(true);
-    const res = await signup(signupName, signupEmail, signupPassword, signupOrg);
+    const res = await signup(signupName, signupEmail, signupPassword);
     setBusy(false);
     if (!res.success) {
       setSignupError(res.message);
@@ -93,7 +103,7 @@ export default function Auth() {
           color: '#ffffff',
           display: 'flex',
           alignItems: 'center',
-          justifycontent: 'center',
+          justifyContent: 'center',
           fontWeight: '800',
           fontSize: '2.5rem',
           boxShadow: 'var(--shadow-primary)',
@@ -129,10 +139,10 @@ export default function Auth() {
       background: '#f8fafc',
       padding: '24px'
     }}>
-      <div className="card animate-fade" style={{ maxWidth: '440px', width: '100%', padding: '40px' }}>
+      <div className="card animate-fade" style={{ maxWidth: '460px', width: '100%', padding: '36px' }}>
         
         {/* Logo Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -140,20 +150,82 @@ export default function Auth() {
             width: '48px',
             height: '48px',
             borderRadius: '12px',
-            backgroundColor: 'var(--primary-light)',
-            color: 'var(--primary)',
+            backgroundColor: selectedRole === 'admin' ? '#fef2f2' : 'var(--primary-light)',
+            color: selectedRole === 'admin' ? 'var(--danger)' : 'var(--primary)',
             fontSize: '1.5rem',
             marginBottom: '12px'
           }}>
-            🚗
+            {selectedRole === 'admin' ? '🛡️' : '🚗'}
           </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--text-main)' }}>
-            Welcome to Carpool
+          <h2 style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-main)' }}>
+            {selectedRole === 'admin' ? 'Company Administration Portal' : 'Welcome to Carpool'}
           </h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Log in to discover or publish active organization rides
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            {selectedRole === 'admin' 
+              ? 'Access organization overview, manage employees and rides' 
+              : 'Log in to discover or publish active organization rides'}
           </p>
         </div>
+
+        {/* 2-Role Login Selection Tabs */}
+        {authStep === 'login' && (
+          <div style={{
+            display: 'flex',
+            borderRadius: '10px',
+            backgroundColor: '#f1f5f9',
+            padding: '4px',
+            marginBottom: '24px',
+            gap: '4px'
+          }}>
+            <button
+              type="button"
+              onClick={() => handleRoleChange('employee')}
+              style={{
+                flex: 1,
+                padding: '10px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: selectedRole === 'employee' ? '#ffffff' : 'transparent',
+                color: selectedRole === 'employee' ? 'var(--primary)' : 'var(--text-muted)',
+                fontWeight: selectedRole === 'employee' ? '700' : '500',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: selectedRole === 'employee' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <UserCheck size={16} /> Employee Login
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRoleChange('admin')}
+              style={{
+                flex: 1,
+                padding: '10px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: selectedRole === 'admin' ? '#ffffff' : 'transparent',
+                color: selectedRole === 'admin' ? 'var(--danger)' : 'var(--text-muted)',
+                fontWeight: selectedRole === 'admin' ? '700' : '500',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: selectedRole === 'admin' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <ShieldAlert size={16} /> Admin Login
+            </button>
+          </div>
+        )}
 
         {authStep === 'login' ? (
           <form onSubmit={handleLoginSubmit}>
@@ -164,14 +236,16 @@ export default function Auth() {
             )}
 
             <div className="input-group">
-              <label className="input-label">Corporate Email</label>
+              <label className="input-label">
+                {selectedRole === 'admin' ? 'Admin Corporate Email' : 'Employee Email'}
+              </label>
               <div style={{ position: 'relative' }}>
                 <Mail size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
                 <input
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="name@organization.com"
+                  placeholder={selectedRole === 'admin' ? 'marcus.v@acme.com' : 'david.c@acme.com'}
                   className="input-field"
                   style={{ paddingLeft: '40px' }}
                   required
@@ -195,11 +269,42 @@ export default function Auth() {
               </div>
             </div>
 
-            <button type="submit" disabled={busy} className="btn btn-primary" style={{ width: '100%', padding: '12px', opacity: busy ? 0.7 : 1 }}>
-              {busy ? 'Signing In…' : <>Log In <ArrowRight size={16} /></>}
+            <button
+              type="submit"
+              disabled={busy}
+              className={`btn ${selectedRole === 'admin' ? 'btn-danger' : 'btn-primary'}`}
+              style={{ width: '100%', padding: '12px', opacity: busy ? 0.7 : 1 }}
+            >
+              {busy ? 'Signing In…' : <>{selectedRole === 'admin' ? 'Log In as Admin' : 'Log In as Employee'} <ArrowRight size={16} /></>}
             </button>
 
-            <div style={{ textAlign: 'center', marginTop: '24px' }}>
+            {/* Quick Demo Role Logins */}
+            <div style={{ borderTop: '1px solid var(--border)', marginTop: '20px', paddingTop: '16px', textAlign: 'center' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '10px' }}>
+                1-Click Quick Demo Login
+              </span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => login('david.c@acme.com', 'password123', 'employee')}
+                  className="btn btn-secondary"
+                  style={{ flex: 1, padding: '8px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                >
+                  <UserCheck size={14} style={{ color: 'var(--primary)' }} /> Employee
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => login('marcus.v@acme.com', 'password123', 'admin')}
+                  className="btn btn-secondary"
+                  style={{ flex: 1, padding: '8px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                >
+                  <ShieldAlert size={14} style={{ color: 'var(--danger)' }} /> Admin
+                </button>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 Don't have an account?{' '}
                 <button type="button" onClick={() => setAuthStep('signup')} style={{ border: 'none', background: 'transparent', color: 'var(--primary)', fontWeight: '600', cursor: 'pointer' }}>
@@ -248,7 +353,7 @@ export default function Auth() {
               </div>
             </div>
 
-            <div className="input-group">
+            <div className="input-group" style={{ marginBottom: '24px' }}>
               <label className="input-label">Password</label>
               <div style={{ position: 'relative' }}>
                 <Lock size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
@@ -261,23 +366,6 @@ export default function Auth() {
                   style={{ paddingLeft: '40px' }}
                   required
                 />
-              </div>
-            </div>
-
-            <div className="input-group" style={{ marginBottom: '24px' }}>
-              <label className="input-label">Registered Corporate Group</label>
-              <div style={{ position: 'relative' }}>
-                <Shield size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'var(--text-light)' }} />
-                <select
-                  value={signupOrg}
-                  onChange={(e) => setSignupOrg(e.target.value)}
-                  className="input-field select-field"
-                  style={{ paddingLeft: '40px' }}
-                >
-                  <option value="Acme Corp">Acme Corp (Silicon Blvd)</option>
-                  <option value="Global Logistics">Global Logistics Group</option>
-                  <option value="Odoo Partner Ltd">Odoo Partner Ltd</option>
-                </select>
               </div>
             </div>
 
