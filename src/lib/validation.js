@@ -1,9 +1,9 @@
-// Shared form-validation helpers.
-// Each validator returns an error message string, or null when the value is valid.
+// Shared form-validation helpers with real-world production rules.
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-// License plates: letters/digits with optional dashes or spaces, e.g. "CA-88X-9002"
-const PLATE_RE = /^[A-Za-z0-9]+([ -][A-Za-z0-9]+)*$/;
+const DISPOSABLE_EMAIL_DOMAINS = [
+  'tempmail.com', 'mailinator.com', 'dispostable.com', '10minutemail.com',
+  'guerrillamail.com', 'trashmail.com', 'yopmail.com', 'test.com', 'example.com', 'fake.com'
+];
 
 export const validateName = (name) => {
   const v = (name || '').trim();
@@ -14,17 +14,32 @@ export const validateName = (name) => {
   return null;
 };
 
+// Real-world strict email validator
 export const validateEmail = (email) => {
-  const v = (email || '').trim();
-  if (!v) return 'Email is required.';
-  if (!EMAIL_RE.test(v)) return 'Please enter a valid email address.';
+  const v = (email || '').trim().toLowerCase();
+  if (!v) return 'Email address is required.';
+  
+  const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!EMAIL_RE.test(v)) return 'Please enter a valid email address (e.g. user@gmail.com).';
+  
+  const domain = v.split('@')[1];
+  if (DISPOSABLE_EMAIL_DOMAINS.includes(domain)) {
+    return 'Disposable or temporary emails are not allowed. Please use a valid personal or corporate email.';
+  }
+  
   return null;
 };
 
+// Real-world strict password validator
 export const validatePassword = (password) => {
   if (!password) return 'Password is required.';
-  if (password.length < 6) return 'Password must be at least 6 characters.';
-  if (password.length > 72) return 'Password must be under 72 characters.';
+  if (password.length < 8) return 'Password must be at least 8 characters long.';
+  if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter (A-Z).';
+  if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter (a-z).';
+  if (!/[0-9]/.test(password)) return 'Password must contain at least one number (0-9).';
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return 'Password must contain at least one special character (!@#$%^&*...).';
+  }
   return null;
 };
 
@@ -66,33 +81,45 @@ export const validateFare = (fare) => {
 
 export const validateSeats = (seats, maxCapacity) => {
   const n = parseInt(seats, 10);
-  if (Number.isNaN(n) || n < 1) return 'At least 1 seat must be offered.';
+  if (Number.isNaN(n) || n < 1) return 'Seats must be at least 1.';
   if (maxCapacity && n > maxCapacity) return `This vehicle only has ${maxCapacity} passenger seats.`;
   return null;
 };
 
 export const validateVehicleModel = (model) => {
-  const v = (model || '').trim();
-  if (!v) return 'Vehicle model is required.';
-  if (v.length < 3) return 'Vehicle model must be at least 3 characters.';
-  if (v.length > 60) return 'Vehicle model must be under 60 characters.';
+  const m = (model || '').trim();
+  if (!m) return 'Car model is required.';
+  if (m.length < 2) return 'Car model must be at least 2 characters.';
+  if (m.length > 60) return 'Car model must be under 60 characters.';
   return null;
 };
 
 export const validateRegistration = (regNo, existingVehicles = []) => {
-  const v = (regNo || '').trim();
-  if (!v) return 'Registration number is required.';
-  if (v.length < 4 || v.length > 15) return 'Registration number must be 4–15 characters.';
-  if (!PLATE_RE.test(v)) return 'Registration may only contain letters, digits, spaces, and dashes.';
-  const normalized = v.replace(/[ -]/g, '').toLowerCase();
+  const r = (regNo || '').trim();
+  if (!r) return 'Registration number is required.';
+  if (r.length < 3) return 'Registration number must be at least 3 characters.';
+  if (!PLATE_RE.test(r)) return 'Registration plate contains invalid characters.';
   const duplicate = existingVehicles.some(
-    (veh) => (veh.registrationNumber || '').replace(/[ -]/g, '').toLowerCase() === normalized
+    (v) => (v.registrationNumber || '').replace(/[- ]/g, '').toLowerCase() === r.replace(/[- ]/g, '').toLowerCase()
   );
   if (duplicate) return 'A vehicle with this registration number is already registered.';
   return null;
 };
 
-export const validateAmount = (amount, { min = 1, max = 10000 } = {}) => {
+export const validateVehicle = (model, regNo, capacity) => {
+  const m = (model || '').trim();
+  const r = (regNo || '').trim();
+  const c = parseInt(capacity, 10);
+
+  if (!m) return 'Car model is required.';
+  if (m.length < 2) return 'Car model must be at least 2 characters.';
+  if (!r) return 'Registration number is required.';
+  if (r.length < 4) return 'Registration number must be at least 4 characters.';
+  if (Number.isNaN(c) || c < 1 || c > 12) return 'Seating capacity must be between 1 and 12.';
+  return null;
+};
+
+export const validateAmount = (amount, { min = 1, max = 100000 } = {}) => {
   const n = parseFloat(amount);
   if (Number.isNaN(n)) return 'Amount must be a number.';
   if (n < min) return `Minimum amount is ₹${min.toFixed(2)}.`;

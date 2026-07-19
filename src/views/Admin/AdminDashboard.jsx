@@ -76,12 +76,15 @@ export default function AdminDashboard() {
       {/* TAB 1: Admin Overview Dashboard */}
       {currentView === 'admin-dashboard' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {/* Admin Stats Grid */}
           <div className="grid-3">
             <div className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>TOTAL REGISTERED USERS</span>
-              <h3 style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px' }}>{employees.length} Employee{employees.length !== 1 ? 's' : ''}</h3>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '4px' }}>Active platform accounts</p>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>TOTAL REGISTERED EMPLOYEES</span>
+              <h3 style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px' }}>
+                {employees.filter(e => e.role !== 'Administrator').length} Employee{employees.filter(e => e.role !== 'Administrator').length !== 1 ? 's' : ''}
+              </h3>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '4px' }}>
+                {employees.filter(e => e.role === 'Administrator').length} System Administrator{employees.filter(e => e.role === 'Administrator').length !== 1 ? 's' : ''} registered
+              </p>
             </div>
 
             <div className="card" style={{ borderLeft: '4px solid var(--success)' }}>
@@ -122,49 +125,117 @@ export default function AdminDashboard() {
 
       {/* TAB 2: Employee database roster */}
       {currentView === 'admin-employees' && (
-        <div className="card">
-          <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Employee Participation database</h3>
-          
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '12px' }}>Employee</th>
-                  <th style={{ padding: '12px' }}>Corporate Email</th>
-                  <th style={{ padding: '12px' }}>Department</th>
-                  <th style={{ padding: '12px' }}>Platform Activity</th>
-                  <th style={{ padding: '12px' }}>Access Node</th>
-                  <th style={{ padding: '12px', textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map(emp => (
-                  <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '1.2rem' }}>{emp.avatar}</span>
-                      <strong>{emp.name}</strong>
-                    </td>
-                    <td style={{ padding: '12px' }}>{emp.email}</td>
-                    <td style={{ padding: '12px' }}>{emp.department}</td>
-                    <td style={{ padding: '12px' }}>{emp.ridesCompleted} rides completed</td>
-                    <td style={{ padding: '12px' }}>
-                      <span className={`badge ${emp.role === 'Access Revoked' ? 'badge-danger' : 'badge-success'}`}>
-                        {emp.role === 'Access Revoked' ? 'Revoked' : 'Approved'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px', textAlign: 'right' }}>
-                      <button
-                        onClick={() => toggleEmployeeAccess(emp.id)}
-                        className="btn btn-secondary"
-                        style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                      >
-                        {emp.role === 'Access Revoked' ? 'Approve Access' : 'Revoke Access'}
-                      </button>
-                    </td>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Section 1: Employee Database */}
+          <div className="card">
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>👤</span> Employee Roster Database
+            </h3>
+            
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '12px' }}>Employee</th>
+                    <th style={{ padding: '12px' }}>Corporate Email</th>
+                    <th style={{ padding: '12px' }}>Role</th>
+                    <th style={{ padding: '12px' }}>Department</th>
+                    <th style={{ padding: '12px' }}>Platform Activity</th>
+                    <th style={{ padding: '12px' }}>Access Node</th>
+                    <th style={{ padding: '12px', textAlign: 'right' }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {employees.filter(emp => emp.role !== 'Administrator').length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        No registered employees yet. New employee registrations will appear here.
+                      </td>
+                    </tr>
+                  ) : (
+                    employees.filter(emp => emp.role !== 'Administrator').map(emp => (
+                      <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '1.2rem' }}>{emp.avatar || '👨‍💻'}</span>
+                          <strong>{emp.name}</strong>
+                        </td>
+                        <td style={{ padding: '12px' }}>{emp.email}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span className="badge badge-info" style={{ backgroundColor: '#eff6ff', color: '#1d4ed8' }}>
+                            Employee
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px' }}>{emp.department || 'Operations'}</td>
+                        <td style={{ padding: '12px' }}>{emp.ridesCompleted || 0} rides completed</td>
+                        <td style={{ padding: '12px' }}>
+                          <span className={`badge ${emp.role === 'Access Revoked' ? 'badge-danger' : 'badge-success'}`}>
+                            {emp.role === 'Access Revoked' ? 'Revoked' : 'Approved'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                          <button
+                            onClick={() => toggleEmployeeAccess(emp.id)}
+                            className="btn btn-secondary"
+                            style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                          >
+                            {emp.role === 'Access Revoked' ? 'Approve Access' : 'Revoke Access'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Section 2: Administrator Accounts */}
+          <div className="card">
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🛡️</span> Organization System Administrators
+            </h3>
+            
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '12px' }}>Administrator Name</th>
+                    <th style={{ padding: '12px' }}>Admin Corporate Email</th>
+                    <th style={{ padding: '12px' }}>Role Type</th>
+                    <th style={{ padding: '12px' }}>Department</th>
+                    <th style={{ padding: '12px' }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.filter(emp => emp.role === 'Administrator').length === 0 ? (
+                    <tr>
+                      <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        No system administrators registered yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    employees.filter(emp => emp.role === 'Administrator').map(emp => (
+                      <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '1.2rem' }}>👨‍💼</span>
+                          <strong>{emp.name}</strong>
+                        </td>
+                        <td style={{ padding: '12px' }}>{emp.email}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span className="badge badge-danger" style={{ backgroundColor: '#fef2f2', color: '#dc2626', fontWeight: '700' }}>
+                            System Administrator
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px' }}>{emp.department || 'Administration'}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span className="badge badge-success">Active Admin</span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

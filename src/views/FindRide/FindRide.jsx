@@ -61,13 +61,17 @@ export default function FindRide() {
   };
 
   const handleConfirmRoute = () => {
-    // Generate a spread of demo ride offers for the entered route (different
-    // service tiers → different prices), then inject them so they're bookable.
-    const generated = generateRidesForRoute({
-      pickup, destination, date, time, seats, routeInfo, orgConfig,
-    });
-    addGeneratedRides(generated);
-    setDemoIds(generated.map((r) => r.id));
+    try {
+      const generated = generateRidesForRoute({
+        pickup, destination, date, time, seats, routeInfo, orgConfig,
+      });
+      if (typeof addGeneratedRides === 'function' && Array.isArray(generated)) {
+        addGeneratedRides(generated);
+        setDemoIds(generated.map((r) => r.id));
+      }
+    } catch (err) {
+      console.warn('[FindRide] Error generating route rides:', err);
+    }
     setStep('results');
   };
 

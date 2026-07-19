@@ -95,3 +95,16 @@ export const rideToRow = (ride) => ({
   distance_km: ride.distanceKm ?? null,
   duration_min: ride.durationMin ?? null,
 });
+
+export const employeeToRow = (emp) => ({
+  id: emp.id,
+  name: emp.name,
+  email: emp.email,
+  avatar: emp.avatar,
+  organization: emp.organization,
+  role: emp.role,
+  department: emp.department,
+  rating: emp.rating,
+  rides_completed: emp.ridesCompleted,
+  wallet_balance: emp.walletBalance,
+});

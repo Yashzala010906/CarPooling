@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { Play, CheckCircle2, CreditCard, MessageSquare, AlertCircle, Compass, Users, MapPin } from 'lucide-react';
+import { Play, CheckCircle2, CreditCard, MessageSquare, AlertCircle, Compass, Users, MapPin, ArrowRight } from 'lucide-react';
 import MapMockup from '../../components/MapMockup';
 import ChatSim from '../../components/ChatSim';
 
@@ -36,11 +36,15 @@ export default function MyTrips() {
     );
   }
 
-  const isDriver = activeTrip.driverId === currentUser.id;
+  const isDriver = activeTrip.driverId === currentUser?.id;
   
   const handlePayment = (e) => {
     e.preventDefault();
     payTrip(activeTrip.id, paymentMethod);
+  };
+
+  const handleTriggerComplete = () => {
+    completeTrip(activeTrip.id);
   };
 
   return (
@@ -80,20 +84,20 @@ export default function MyTrips() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', fontSize: '0.85rem' }}>
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>DEPARTURE TIME</span>
-                <strong>{new Date(activeTrip.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
+                <strong>{activeTrip.dateTime ? new Date(activeTrip.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Scheduled'}</strong>
               </div>
               
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>ESTIMATED FARE</span>
-                <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>₹{activeTrip.fare.toFixed(2)}</strong>
+                <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>₹{(activeTrip.fare || 0).toFixed(2)}</strong>
               </div>
 
               <div style={{ gridColumn: 'span 2' }}>
                 <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>ROUTE</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <strong>{activeTrip.pickup.split('(')[0]}</strong> 
+                  <strong>{activeTrip.pickup?.split('(')[0]}</strong> 
                   <span style={{ color: 'var(--text-light)' }}>➔</span> 
-                  <strong>{activeTrip.destination.split('(')[0]}</strong>
+                  <strong>{activeTrip.destination?.split('(')[0]}</strong>
                 </div>
               </div>
 
@@ -106,87 +110,90 @@ export default function MyTrips() {
                 <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>COWORKER PARTICIPANT</span>
                 <strong>
                   {isDriver 
-                    ? (activeTrip.passengerName ? `${activeTrip.passengerAvatar} ${activeTrip.passengerName}` : "Waiting for Passenger...") 
-                    : `${activeTrip.driverAvatar} ${activeTrip.driverName} (Driver)`
+                    ? (activeTrip.passengerName ? `${activeTrip.passengerAvatar || '👨‍💻'} ${activeTrip.passengerName}` : "Waiting for Passenger...") 
+                    : `${activeTrip.driverAvatar || '🚗'} ${activeTrip.driverName} (Driver)`
                   }
                 </strong>
               </div>
             </div>
 
-            {/* Simulated actions to advance status */}
+            {/* Trip Actions & Payment Gateway */}
             <div style={{ marginTop: '24px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
               <h5 style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                TRIP ACTIONS
+                TRIP ACTIONS & PAYMENT
               </h5>
               
-              {isDriver ? (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  {activeTrip.status === 'booked' && (
-                    <button onClick={() => startTrip(activeTrip.id)} className="btn btn-primary" style={{ flex: 1 }}>
-                      <Play size={16} /> Start Ride (Move Vehicle)
-                    </button>
-                  )}
-                  {activeTrip.status === 'in_progress' && (
-                    <button onClick={() => completeTrip(activeTrip.id)} className="btn btn-success" style={{ flex: 1, backgroundColor: 'var(--success)', color: '#ffffff' }}>
-                      <CheckCircle2 size={16} /> Complete Ride
-                    </button>
-                  )}
-                  {activeTrip.status === 'payment_pending' && (
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      Waiting for passenger to complete payment transaction.
-                    </div>
-                  )}
-                  <button onClick={() => cancelRide(activeTrip.id)} className="btn btn-ghost btn-danger" style={{ color: 'var(--danger)' }}>
-                    Cancel Ride
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  {activeTrip.status === 'booked' && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        Waiting for driver ({activeTrip.driverName}) to launch the vehicle.
-                      </span>
-                      <button onClick={() => cancelRide(activeTrip.id)} className="btn btn-secondary">
-                        Cancel Booking
-                      </button>
-                    </div>
-                  )}
-                  {activeTrip.status === 'in_progress' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--success)' }}>
-                      <span className="map-pulse" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'currentColor' }}></span>
-                      <span style={{ fontSize: '0.85rem', fontWeight: '500' }}>Journey active! Monitor path on the map above.</span>
-                    </div>
-                  )}
-                  {activeTrip.status === 'payment_pending' && (
-                    <form onSubmit={handlePayment} className="card" style={{ padding: '16px', background: '#eff6ff', borderColor: '#bfdbfe' }}>
-                      <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <CreditCard size={16} /> Complete Payment Gateways
-                      </h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                        The driver has completed the route. Please choose a method to discharge the fare.
-                      </p>
-                      
-                      <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                        {['Wallet', 'UPI', 'Card', 'Cash'].map(method => (
-                          <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer' }}>
-                            <input
-                              type="radio"
-                              name="pay-method"
-                              checked={paymentMethod === method}
-                              onChange={() => setPaymentMethod(method)}
-                              style={{ accentColor: 'var(--primary)' }}
-                            />
-                            {method}
-                          </label>
-                        ))}
-                      </div>
+              {/* Payment Section (Shown when payment_pending OR when user clicks complete) */}
+              {activeTrip.status === 'payment_pending' ? (
+                <form onSubmit={handlePayment} className="card animate-fade" style={{ padding: '20px', background: '#f0fdf4', borderColor: '#bbf7d0' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#166534', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CreditCard size={18} /> Select Payment Gateway
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: '#15803d', marginBottom: '16px' }}>
+                    Commute finished! Choose your payment method to discharge <strong>₹{(activeTrip.fare || 0).toFixed(2)}</strong> and save to Ride History.
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                    {['Wallet', 'UPI', 'Card', 'Cash'].map(method => (
+                      <label key={method} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.85rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        backgroundColor: paymentMethod === method ? '#ffffff' : '#f1f5f9',
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        border: `1px solid ${paymentMethod === method ? 'var(--primary)' : 'var(--border)'}`,
+                        color: paymentMethod === method ? 'var(--primary)' : 'var(--text-main)',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <input
+                          type="radio"
+                          name="pay-method"
+                          checked={paymentMethod === method}
+                          onChange={() => setPaymentMethod(method)}
+                          style={{ accentColor: 'var(--primary)' }}
+                        />
+                        {method === 'Wallet' ? '💳 Wallet' : method === 'UPI' ? '📱 UPI' : method === 'Card' ? '💳 Credit/Debit Card' : '💵 Cash'}
+                      </label>
+                    ))}
+                  </div>
 
-                      <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                        Pay ₹{activeTrip.fare.toFixed(2)} Now
-                      </button>
-                    </form>
-                  )}
+                  <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', fontSize: '0.95rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    Pay ₹{(activeTrip.fare || 0).toFixed(2)} & Save to Ride History <ArrowRight size={18} />
+                  </button>
+                </form>
+              ) : (
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  {/* Primary Complete Ride & Pay Button for Passenger or Driver */}
+                  <button
+                    onClick={handleTriggerComplete}
+                    className="btn btn-primary"
+                    style={{
+                      flex: 2,
+                      padding: '12px',
+                      backgroundColor: 'var(--success)',
+                      borderColor: 'var(--success)',
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <CheckCircle2 size={18} /> Complete Ride & Pay (₹{(activeTrip.fare || 0).toFixed(2)})
+                  </button>
+
+                  <button
+                    onClick={() => cancelRide(activeTrip.id)}
+                    className="btn btn-secondary"
+                    style={{ flex: 1, color: 'var(--danger)', padding: '12px' }}
+                  >
+                    Cancel Booking
+                  </button>
                 </div>
               )}
             </div>
