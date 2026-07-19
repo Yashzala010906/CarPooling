@@ -4,12 +4,16 @@ import { Search, MapPin, Calendar, Clock, Users, ArrowRight, CheckCircle, Naviga
 import MapMockup from '../../components/MapMockup';
 import { validateRoute } from '../../lib/validation';
 import { getRouteInfo, formatDuration } from '../../lib/geo';
+import { generateRidesForRoute } from '../../lib/demoRides';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export default function FindRide() {
-  const { currentUser, rides, bookRide, places } = useContext(AppContext);
+  const { currentUser, rides, bookRide, places, orgConfig, addGeneratedRides } = useContext(AppContext);
   const [step, setStep] = useState('search'); // 'search', 'confirm-route', 'results'
+
+  // IDs of the demo ride offers generated for the current route search.
+  const [demoIds, setDemoIds] = useState([]);
 
   // Search parameters
   const [pickup, setPickup] = useState('');
@@ -57,6 +61,13 @@ export default function FindRide() {
   };
 
   const handleConfirmRoute = () => {
+    // Generate a spread of demo ride offers for the entered route (different
+    // service tiers → different prices), then inject them so they're bookable.
+    const generated = generateRidesForRoute({
+      pickup, destination, date, time, seats, routeInfo, orgConfig,
+    });
+    addGeneratedRides(generated);
+    setDemoIds(generated.map((r) => r.id));
     setStep('results');
   };
 
@@ -72,12 +83,13 @@ export default function FindRide() {
     }
   };
 
-  // Published rides with open seats, excluding the user's own listings
-  const availableRides = rides.filter(r =>
-    r.status === 'published' &&
-    r.seatsAvailable >= parseInt(seats, 10) &&
-    r.driverId !== currentUser?.id
-  );
+  // Results = demo offers generated for this route (shown first), followed by
+  // any real colleague-published rides that also have open seats.
+  const seatsNeeded = parseInt(seats, 10);
+  const isOpen = (r) => r.status === 'published' && r.seatsAvailable >= seatsNeeded;
+  const demoResults = rides.filter(r => demoIds.includes(r.id) && isOpen(r));
+  const realResults = rides.filter(r => !r.isDemo && isOpen(r) && r.driverId !== currentUser?.id);
+  const availableRides = [...demoResults, ...realResults];
 
   return (
     <div className="view-container animate-fade">
@@ -360,7 +372,8 @@ export default function FindRide() {
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              {availableRides.length} matching rides found traveling your direction
+              {availableRides.length} rides available from {pickup || 'pickup'} to {destination || 'destination'}
+              {routeInfo ? ` · ${routeInfo.distanceKm.toFixed(1)} km` : ''}
             </span>
             <button onClick={() => setStep('confirm-route')} className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>
               Back to Route
@@ -386,7 +399,14 @@ export default function FindRide() {
                       {ride.driverAvatar}
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '0.95rem', margin: 0 }}>{ride.driverName}</h4>
+                      <h4 style={{ fontSize: '0.95rem', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        {ride.driverName}
+                        {ride.serviceTag && (
+                          <span className="badge badge-success" style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '6px', fontWeight: '700' }}>
+                            {ride.serviceTag}
+                          </span>
+                        )}
+                      </h4>
                       <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '600' }}>★ {ride.driverRating} Rating</span>
                     </div>
                   </div>
@@ -416,7 +436,9 @@ export default function FindRide() {
                   {/* Pricing and Action */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '1 1 180px', justifyContent: 'flex-end' }}>
                     <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fare per seat</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {ride.serviceLabel ? `${ride.serviceLabel} · per seat` : 'Fare per seat'}
+                      </span>
                       <div style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--primary)' }}>
                         ₹{ride.fare.toFixed(2)}
                       </div>

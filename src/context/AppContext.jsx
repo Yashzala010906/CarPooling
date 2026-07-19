@@ -341,6 +341,17 @@ export const AppProvider = ({ children }) => {
     return { success: true };
   };
 
+  // Inject freshly generated demo ride offers into local state so they are
+  // searchable and bookable. They are intentionally NOT persisted to Supabase —
+  // each search regenerates them. Previously generated (still-unbooked) demo
+  // offers are dropped so the results list never accumulates stale rides.
+  const addGeneratedRides = (generated) => {
+    setRides((prev) => {
+      const kept = prev.filter((r) => !r.isDemo || r.status !== 'published');
+      return [...generated, ...kept];
+    });
+  };
+
   const bookRide = (rideId) => {
     if (!currentUser) return { success: false, message: 'You must be logged in.' };
     const target = rides.find(r => r.id === rideId);
@@ -609,6 +620,7 @@ export const AppProvider = ({ children }) => {
       signup,
       logout,
       publishRide,
+      addGeneratedRides,
       bookRide,
       cancelRide,
       startTrip,
